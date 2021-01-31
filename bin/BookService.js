@@ -5,52 +5,46 @@ class BookService {
         this.data = [];
         this.isExcuted = false;
     }
+
+    //generate id for new added books based on last id in file
     async getId() {
         let lastBook = this.data[this.data.length - 1]
-        return lastBook.id;
+        if(!lastBook) return 1;
+        return lastBook.id+1;
     }
 
-    async find(keyword) {
-        let arr = []
-        //search in each obj for the keyword in title authur desc
+    //update specific book with id and replace it with new data fields
+    //and keep same id
+    async updateBook(id, newBook) {
         for (let obj of this.data) {
-            if (obj.title.includes(keyword)) {
-                arr.push(obj)
-            } else if (obj.author.includes(keyword)) {
-                arr.push(obj)
-            } else if (obj.description.includes(keyword)) {
-                arr.push(obj)
-            }
-        }
-        return arr;
-    }
-
-    async update(id,newBook){
-        for(let obj of this.data){
-            if(obj.id == id){
-                Object.keys(obj).forEach(function(key) {
-                    if(key !='id') obj[key] = newBook[key];
-                  }) 
+            if (obj.id == id) {
+                Object.keys(obj).forEach(function (key) {
+                    if (key != 'id') obj[key] = newBook[key];
+                })
             }
         }
     }
 
+    //add book to the loaded data
     async saveBook(obj) {
-      this.data.push({
-          id:obj.id,
-          title:obj.title,
-          author:obj.author,
-          description:obj.description
-      })
-     // console.log('databeforesave',this.data)
+        this.data.push(obj)
     }
 
-    async saveData(){
-        console.log('2 databeforesave',this.data)
-        fs.writeFile('books.json',JSON.stringify(this.data),(err)=>{
+    //method run on exit of application to persist books to disk
+    async saveData() {
+        fs.writeFile('books.json', JSON.stringify(this.data), (err) => {
             console.log(err)
         })
     }
+    //method run on application start to store all books in array of objects
+    //
+    async loadData() {
+        if (!this.isExcuted) {
+            this.data = await require('./books.json')
+        }
+    }
+
+    //return list of books id,title 
     async viewBooks() {
         let newBooks = this.data.map(book => {
             return {
@@ -58,15 +52,11 @@ class BookService {
                 title: book.title
             }
         })
+        if(!newBooks) throw new Error('books not found')
         return newBooks;
     }
-    
-    async loadData() {
-        if (!this.isExcuted) {
-            this.data = await require('./books.json')
-        }
-    }
 
+    //get specific book object by id from file
     async viewSpecificBook(id) {
         let isFound = false;
         for (let book of this.data) {
@@ -80,5 +70,20 @@ class BookService {
         }
     }
 
+    //generic find method to search for keyword in whole objects
+    async find(keyword) {
+        let arr = []
+        for (let obj of this.data) {
+            if (obj.title.includes(keyword)) {
+                arr.push(obj)
+            } else if (obj.author.includes(keyword)) {
+                arr.push(obj)
+            } else if (obj.description.includes(keyword)) {
+                arr.push(obj)
+            }
+        }
+        if(arr.length == 0) throw new Error('no search result')
+        return arr;
+    }
 }
 module.exports = BookService
