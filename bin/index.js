@@ -24,6 +24,7 @@ const showMenu = async () => {
           if (!answers.getBookById) return goBack()
           let book = await bc.getSpecificBook(parseInt(answers.getBookById))
           console.log(` ID: ${book.id}\n Title: ${book.title}\n Author: ${book.author}\n Description: ${book.description}`)
+          goBack()  
         })
       } else if (answers.menu == 'search for a book') {
         inquirer.prompt([{
@@ -76,8 +77,12 @@ const showMenu = async () => {
           type: 'input',
           message: 'enter book description'
         }]).then(async (answers) => {
-          let newBook = {title: answers.title,author: answers.author,description: answers.description}
-          await bc.updateBook(answers.id,newBook)
+          let updatedBook = {}
+          if(answers.title) updatedBook['title'] = answers.title
+          if(answers.author) updatedBook['author'] = answers.author
+          if(answers.description) updatedBook['description'] = answers.description
+          
+          await bc.updateBook(answers.id,updatedBook)
           console.log('book updated')
           goBack()
         })
