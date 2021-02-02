@@ -54,7 +54,6 @@ class BookController {
     async getSpecificBook(id) {
         try {
             let book = await this.service.viewSpecificBook(id)
-            console.log(book)
             return book;
         } catch (err) {
             console.log(err.message)
@@ -85,25 +84,27 @@ class BookController {
 
 }
 
-async function main() {
-    //BookController.createBook('mo',"ali","uhsidiausd");
-    //BookController.getBooks();
-    let bc = new BookController(new BookService())
-    await bc.OnApllicationStart()
-    bc.getBooks();
-    bc.updateBook(30, {
-        title: "oskokok",
-        author: "kokoko",
-        description: "momomomo"
-    })
-    //bc.search('dwdwd')
-    await bc.createBook("momoh", "usususus", "isjdoiasdjo")
-    await bc.createBook("momoh", "usususus", "isjdoiasdjo")
-    await bc.createBook("momoh", "usususus", "isjdoiasdjo")
-    await bc.createBook("momoh", "usususus", "isjdoiasdjo")
-    await bc.getSpecificBook(30)
+module.exports = BookController
 
-    bc.getBooks();
-    bc.OnApllicationExit()
-}
-main()
+// async function main() {
+//     //BookController.createBook('mo',"ali","uhsidiausd");
+//     //BookController.getBooks();
+//     let bc = new BookController(new BookService())
+//     await bc.OnApllicationStart()
+//     bc.getBooks();
+//     // bc.updateBook(30, {
+//     //     title: "oskokok",
+//     //     author: "kokoko",
+//     //     description: "momomomo"
+//     // })
+//     //bc.search('dwdwd')
+//     // await bc.createBook("momoh", "usususus", "isjdoiasdjo")
+//     // await bc.createBook("momoh", "usususus", "isjdoiasdjo")
+//     // await bc.createBook("momoh", "usususus", "isjdoiasdjo")
+//     // await bc.createBook("momoh", "usususus", "isjdoiasdjo")
+//     // await bc.getSpecificBook(30)
+
+//     bc.getBooks();
+//     bc.OnApllicationExit()
+// }
+// main()

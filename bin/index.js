@@ -1,88 +1,115 @@
-'use strict';
+let inquirer = require('inquirer');
+let BookController = require('./bookController')
+let BookService = require('./BookService')
 
-var inquirer = require('inquirer');
-var directionsPrompt = {
-    type: 'list',
-    name: 'direction',
-    message: 'Which direction would you like to go?',
-    choices: ['Forward', 'Right', 'Left', 'Back'],
-  };
-  
-  function main() {
-    console.log('You find youself in a small room, there is a door in front of you.');
-    exitHouse();
-  }
-  
-  function exitHouse() {
-    inquirer.prompt(directionsPrompt).then((answers) => {
-      if (answers.direction === 'Forward') {
-        console.log('You find yourself in a forest');
-        console.log(
-          'There is a wolf in front of you; a friendly looking dwarf to the right and an impasse to the left.'
-        );
-        encounter1();
-      } else {
-        console.log('You cannot go that way. Try again');
-        exitHouse();
+let bc = new BookController(new BookService())
+
+
+const showMenu = async () => {
+  await bc.OnApllicationStart()
+  inquirer
+    .prompt([{
+      name: 'menu',
+      type: 'list',
+      message: '======= Book Manager =======',
+      choices: ['view all books', 'add a book', 'edit a book', 'search for a book', 'save and exit'],
+    }]).then(async (answers) => {
+      if (answers.menu == 'view all books') {
+        await getbooks()
+        inquirer.prompt([{
+          name: 'getBookById',
+          type: 'input',
+          message: 'enter book ID'
+        }]).then(async (answers) => {
+          if (!answers.getBookById) return goBack()
+          let book = await bc.getSpecificBook(parseInt(answers.getBookById))
+          console.log(` ID: ${book.id}\n Title: ${book.title}\n Author: ${book.author}\n Description: ${book.description}`)
+        })
+      } else if (answers.menu == 'search for a book') {
+        inquirer.prompt([{
+          name: 'search',
+          type: 'input',
+          message: 'enter keyword'
+        }]).then(async (answers) => {
+          let books = await bc.search(answers.search)
+          if (!books) return goBack()
+          for (let book of books) {
+            console.log(`[${book.id}] ${book.title}\n`)
+          }
+          goBack()
+        })
+      } else if (answers.menu == 'add a book') {
+        inquirer.prompt([{
+          name: 'title',
+          type: 'input',
+          message: 'enter book title'
+        }, {
+          name: 'author',
+          type: 'input',
+          message: 'enter book author name'
+        }, {
+          name: 'description',
+          type: 'input',
+          message: 'enter book description'
+        }]).then(async (answers) => {
+          await bc.createBook(answers.title, answers.author, answers.description)
+          console.log('book saved')
+          goBack()
+        })
+      } else if (answers.menu == 'edit a book') {
+        await getbooks()
+        inquirer.prompt([{
+          name: 'id',
+          type: 'input',
+          message: 'enter book ID'
+        },{
+          name: 'title',
+          type: 'input',
+          message: 'enter book title'
+        }
+        , {
+          name: 'author',
+          type: 'input',
+          message: 'enter book author name'
+        }, {
+          name: 'description',
+          type: 'input',
+          message: 'enter book description'
+        }]).then(async (answers) => {
+          let newBook = {title: answers.title,author: answers.author,description: answers.description}
+          await bc.updateBook(answers.id,newBook)
+          console.log('book updated')
+          goBack()
+        })
       }
+    })
+    .catch((err) => {
+      console.log(err);
     });
+
+}
+async function getbooks(){
+  let books = await bc.getBooks()
+  for (let book of books) {
+    console.log(`[${book.id}] ${book.title}\n`)
   }
-  
-  function encounter1() {
-    inquirer.prompt(directionsPrompt).then((answers) => {
-      var direction = answers.direction;
-      if (direction === 'Forward') {
-        console.log('You attempt to fight the wolf');
-        console.log(
-          'Theres a stick and some stones lying around you could use as a weapon'
-        );
-        encounter2b();
-      } else if (direction === 'Right') {
-        console.log('You befriend the dwarf');
-        console.log('He helps you kill the wolf. You can now move forward');
-        encounter2a();
+}
+async function goBack() {
+  inquirer
+    .prompt([{
+      name: 'back',
+      type: 'input',
+      message: 'Go again?',
+      choices: ['yes', 'no']
+    }]).then(async (answers) => {
+      if (answers.back === 'yes') {
+        return showMenu();
       } else {
-        console.log('You cannot go that way');
-        encounter1();
+        await bc.OnApllicationExit()
       }
-    });
-  }
-  
-  function encounter2a() {
-    inquirer.prompt(directionsPrompt).then((answers) => {
-      var direction = answers.direction;
-      if (direction === 'Forward') {
-        var output = 'You find a painted wooden sign that says:';
-        output += ' \n';
-        output += ' ____  _____  ____  _____ \n';
-        output += '(_  _)(  _  )(  _ \\(  _  ) \n';
-        output += '  )(   )(_)(  )(_) ))(_)(  \n';
-        output += ' (__) (_____)(____/(_____) \n';
-        console.log(output);
-      } else {
-        console.log('You cannot go that way');
-        encounter2a();
-      }
-    });
-  }
-  
-  function encounter2b() {
-    inquirer
-      .prompt({
-        type: 'list',
-        name: 'weapon',
-        message: 'Pick one',
-        choices: [
-          'Use the stick',
-          'Grab a large rock',
-          'Try and make a run for it',
-          'Attack the wolf unarmed',
-        ],
-      })
-      .then(() => {
-        console.log('The wolf mauls you. You die. The end.');
-      });
-  }
-  
-  main();
-  
+    })
+}
+showMenu();
+process.on('SIGINT',()=>{
+   bc.OnApllicationExit()
+})

@@ -41,6 +41,7 @@ class BookService {
     async loadData() {
         if (!this.isExcuted) {
             this.data = await require('./books.json')
+            this.isExcuted = true
         }
     }
 
@@ -82,7 +83,7 @@ class BookService {
                 arr.push(obj)
             }
         }
-        if(arr.length == 0) throw new Error('no search result')
+        if(!arr.length) throw new Error('no search result')
         return arr;
     }
 }
