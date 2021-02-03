@@ -64,8 +64,6 @@ class BookController {
     //update book if exists
     async updateBook(id, newBook) {
         try {
-            //first find if book exists then update
-            await this.getSpecificBook(id)
             this.service.updateBook(id, newBook)
         } catch (err) {
             console.log(err.message)
@@ -85,26 +83,3 @@ class BookController {
 }
 
 module.exports = BookController
-
-// async function main() {
-//     //BookController.createBook('mo',"ali","uhsidiausd");
-//     //BookController.getBooks();
-//     let bc = new BookController(new BookService())
-//     await bc.OnApllicationStart()
-//     bc.getBooks();
-//     // bc.updateBook(30, {
-//     //     title: "oskokok",
-//     //     author: "kokoko",
-//     //     description: "momomomo"
-//     // })
-//     //bc.search('dwdwd')
-//     // await bc.createBook("momoh", "usususus", "isjdoiasdjo")
-//     // await bc.createBook("momoh", "usususus", "isjdoiasdjo")
-//     // await bc.createBook("momoh", "usususus", "isjdoiasdjo")
-//     // await bc.createBook("momoh", "usususus", "isjdoiasdjo")
-//     // await bc.getSpecificBook(30)
-
-//     bc.getBooks();
-//     bc.OnApllicationExit()
-// }
-// main()

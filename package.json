@@ -2,19 +2,12 @@
   "name": "new-folder",
   "version": "1.0.0",
   "description": "",
-  "main": "bin/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "chalk-pipe": "^5.0.0",
-    "commander": "^7.0.0",
-    "inquirer": "^7.3.3",
-    "yargs": "^16.2.0"
-  },
-  "bin": {
-    "hello": "./bin/index.js"
+    "inquirer": "^7.3.3"
   }
 }

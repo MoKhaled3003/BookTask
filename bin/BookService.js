@@ -3,7 +3,7 @@ const fs = require('fs');
 class BookService {
     constructor() {
         this.data = [];
-        this.isExcuted = false;
+        this.isDataLoaded = false;
     }
 
     //generate id for new added books based on last id in file
@@ -18,9 +18,7 @@ class BookService {
     async updateBook(id, newBook) {
         for (let obj of this.data) {
             if (obj.id == id) {
-                Object.keys(obj).forEach(function (key) {
-                    if (key != 'id') obj[key] = newBook[key];
-                })
+                Object.assign(obj,newBook)
             }
         }
     }
@@ -33,15 +31,14 @@ class BookService {
     //method run on exit of application to persist books to disk
     async saveData() {
         fs.writeFile('books.json', JSON.stringify(this.data), (err) => {
-            console.log(err)
         })
     }
     //method run on application start to store all books in array of objects
     //
     async loadData() {
-        if (!this.isExcuted) {
-            this.data = await require('./books.json')
-            this.isExcuted = true
+        if (!this.isDataLoaded) {
+            this.data = require('./books.json')
+            this.isDataLoaded = true
         }
     }
 
@@ -59,16 +56,12 @@ class BookService {
 
     //get specific book object by id from file
     async viewSpecificBook(id) {
-        let isFound = false;
         for (let book of this.data) {
             if (book.id === id) {
-                isFound = true;
                 return book
             }
         }
-        if (!isFound) {
-            throw Error('book not found')
-        }
+        throw Error('book not found')
     }
 
     //generic find method to search for keyword in whole objects
@@ -76,7 +69,7 @@ class BookService {
         let arr = []
         for (let obj of this.data) {
             if (obj.title.includes(keyword)) {
-                arr.push(obj)
+                arr.push(obj) 
             } else if (obj.author.includes(keyword)) {
                 arr.push(obj)
             } else if (obj.description.includes(keyword)) {
