@@ -24,7 +24,7 @@ const showMenu = async () => {
           message: 'enter keyword'
         }]).then(async (answers) => {
           let books = await bc.search(answers.search)
-          if (!books) return goBack()
+          if (!books) return backToMainMenu()
           for (let book of books) {
             console.log(`[${book.id}] ${book.title}\n`)
           }
@@ -46,7 +46,7 @@ const showMenu = async () => {
         }]).then(async (answers) => {
           await bc.createBook(answers.title, answers.author, answers.description)
           console.log('book saved')
-          goBack()
+          backToMainMenu()
         })
       } else if (answers.menu == 'edit a book') {
         await getbooks()
@@ -74,7 +74,7 @@ const showMenu = async () => {
           if(answers.description) updatedBook['description'] = answers.description
           await bc.updateBook(answers.id,updatedBook)
           console.log('book updated')
-          goBack()
+          backToMainMenu()
         })
       } else if(answers.menu == 'save and exit'){
         console.log('library saved')
@@ -98,14 +98,14 @@ async function getBookById(){
     type: 'input',
     message: 'enter book ID'
   }]).then(async (answers) => {
-    if (!answers.getBookById) return goBack()
+    if (!answers.getBookById) return backToMainMenu()
     let book = await bc.getSpecificBook(parseInt(answers.getBookById))
-    if(!book) return goBack()
+    if(!book) return backToMainMenu()
     console.log(` ID: ${book.id}\n Title: ${book.title}\n Author: ${book.author}\n Description: ${book.description}`)
-    goBack()  
+    backToMainMenu()  
   })
 }
-async function goBack() {
+async function backToMainMenu() {
   inquirer
     .prompt([{
       name: 'back',
